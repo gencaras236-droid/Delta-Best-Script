@@ -1,0 +1,529 @@
+-- 🔥 WORL PREMIUM HİLE PAKETİ - TELEPORT SİSTEMLİ 🔥
+-- By Worl - Tüm hakları saklıdır
+
+loadstring(function()
+    -- HIZLI YÜKLEME
+    local startTime = tick()
+    
+    -- SERVİSLER
+    local Players = game:GetService("Players")
+    local UIS = game:GetService("UserInputService")
+    local RS = game:GetService("RunService")
+    local WS = game:GetService("Workspace")
+    
+    -- OYUNCU
+    local player = Players.LocalPlayer
+    local character = player.Character or player.CharacterAdded:Wait()
+    local humanoid = character:WaitForChild("Humanoid")
+    local hrp = character:WaitForChild("HumanoidRootPart")
+    
+    -- TELEPORT SİSTEMİ İÇİN
+    local savedPosition = nil
+    local teleportMarker = nil
+    
+    -- AVATAR DEĞİŞTİRME (WORLSHOPP)
+    spawn(function()
+        task.wait(2)
+        local success = pcall(function()
+            player.CharacterAppearance = "https://www.roblox.com/users/4567890123/character"
+        end)
+        if success then
+            print("✅ Avatar Worlshopp olarak değiştirildi!")
+        end
+    end)
+    
+    -- AYARLAR
+    local settings = {
+        Fly = false,
+        Noclip = false,
+        God = false,
+        InfJump = false,
+        Speed = false,
+        Ragdoll = true,
+        SpeedValue = 50,
+        WalkSpeed = 16
+    }
+    
+    -- BY WORL AÇMA BUTONU
+    local openButton = Instance.new("ScreenGui")
+    openButton.Name = "ByWorlButton"
+    openButton.Parent = game:GetService("CoreGui")
+    
+    local mainBtn = Instance.new("TextButton")
+    mainBtn.Size = UDim2.new(0, 150, 0, 60)
+    mainBtn.Position = UDim2.new(0, 20, 0.5, -30)
+    mainBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+    mainBtn.BackgroundTransparency = 0.2
+    mainBtn.Text = ""
+    mainBtn.ZIndex = 10
+    mainBtn.Parent = openButton
+    
+    local worlText = Instance.new("TextLabel")
+    worlText.Size = UDim2.new(1, 0, 0.6, 0)
+    worlText.Position = UDim2.new(0, 0, 0, 5)
+    worlText.BackgroundTransparency = 1
+    worlText.Text = "WORL"
+    worlText.TextColor3 = Color3.fromRGB(255, 255, 100)
+    worlText.Font = Enum.Font.GothamBlack
+    worlText.TextSize = 28
+    worlText.TextStrokeTransparency = 0
+    worlText.TextStrokeColor3 = Color3.fromRGB(0, 0, 0)
+    worlText.Parent = mainBtn
+    
+    local byWorlText = Instance.new("TextLabel")
+    byWorlText.Size = UDim2.new(1, 0, 0.4, 0)
+    byWorlText.Position = UDim2.new(0, 0, 0.6, 0)
+    byWorlText.BackgroundTransparency = 1
+    byWorlText.Text = "By Worl"
+    byWorlText.TextColor3 = Color3.fromRGB(200, 200, 200)
+    byWorlText.Font = Enum.Font.GothamBold
+    byWorlText.TextSize = 14
+    byWorlText.Parent = mainBtn
+    
+    -- MENÜ DEĞİŞKENİ
+    local menuOpen = false
+    local mainMenu
+    
+    -- TELEPORT MARKER OLUŞTURMA
+    function createTeleportMarker(position)
+        if teleportMarker then
+            teleportMarker:Destroy()
+        end
+        
+        teleportMarker = Instance.new("Part")
+        teleportMarker.Name = "TeleportMarker"
+        teleportMarker.Size = Vector3.new(2, 0.2, 2)
+        teleportMarker.Position = position
+        teleportMarker.Anchored = true
+        teleportMarker.CanCollide = false
+        teleportMarker.Transparency = 0.3
+        teleportMarker.Color = Color3.fromRGB(0, 255, 255)
+        teleportMarker.Material = Enum.Material.Neon
+        teleportMarker.Parent = WS
+        
+        -- IŞIK EFEKTİ
+        local pointLight = Instance.new("PointLight")
+        pointLight.Brightness = 2
+        pointLight.Range = 15
+        pointLight.Color = Color3.fromRGB(0, 200, 255)
+        pointLight.Parent = teleportMarker
+        
+        -- DÖNME EFEKTİ
+        spawn(function()
+            while teleportMarker and teleportMarker.Parent do
+                teleportMarker.CFrame = teleportMarker.CFrame * CFrame.Angles(0, math.rad(2), 0)
+                task.wait()
+            end
+        end)
+        
+        return teleportMarker
+    end
+    
+    -- TELEPORT FONKSİYONLARI
+    function setTeleportPosition()
+        savedPosition = hrp.Position
+        createTeleportMarker(savedPosition)
+        print("📍 Teleport noktası kaydedildi: " .. tostring(savedPosition))
+        
+        -- MESAJ GÖSTER
+        local hint = Instance.new("Hint")
+        hint.Text = "✅ Teleport noktası ayarlandı!"
+        hint.Parent = WS
+        game.Debris:AddItem(hint, 3)
+    end
+    
+    function teleportToSaved()
+        if savedPosition then
+            -- TELEPORT EFEKTİ
+            local effect = Instance.new("Part")
+            effect.Size = Vector3.new(5, 5, 5)
+            effect.Position = hrp.Position
+            effect.Anchored = true
+            effect.CanCollide = false
+            effect.Transparency = 0.5
+            effect.Color = Color3.fromRGB(255, 100, 255)
+            effect.Material = Enum.Material.Neon
+            effect.Parent = WS
+            
+            spawn(function()
+                for i = 1, 10 do
+                    effect.Transparency = effect.Transparency + 0.05
+                    effect.Size = effect.Size + Vector3.new(0.5, 0.5, 0.5)
+                    task.wait(0.05)
+                end
+                effect:Destroy()
+            end)
+            
+            -- TELEPORT
+            character:SetPrimaryPartCFrame(CFrame.new(savedPosition + Vector3.new(0, 3, 0)))
+            print("🚀 Teleport edildi!")
+            
+            -- MESAJ GÖSTER
+            local hint = Instance.new("Hint")
+            hint.Text = "🚀 Işınlanılıyor..."
+            hint.Parent = WS
+            game.Debris:AddItem(hint, 2)
+        else
+            print("❌ Kayıtlı teleport noktası yok!")
+            
+            local hint = Instance.new("Hint")
+            hint.Text = "❌ Önce TeleportPart'a bas!"
+            hint.Parent = WS
+            game.Debris:AddItem(hint, 3)
+        end
+    end
+    
+    -- ANA MENÜ OLUŞTURMA
+    function createMenu()
+        if mainMenu then mainMenu:Destroy() end
+        
+        mainMenu = Instance.new("ScreenGui")
+        mainMenu.Name = "WorlMenu"
+        mainMenu.Parent = game:GetService("CoreGui")
+        
+        local frame = Instance.new("Frame")
+        frame.Size = UDim2.new(0, 320, 0, 450) -- Yükseklik arttı
+        frame.Position = UDim2.new(0.5, -160, 0.5, -225)
+        frame.BackgroundColor3 = Color3.fromRGB(25, 25, 35)
+        frame.BackgroundTransparency = 0.1
+        frame.BorderSizePixel = 0
+        frame.Active = true
+        frame.Draggable = true
+        frame.Parent = mainMenu
+        
+        local title = Instance.new("TextLabel")
+        title.Size = UDim2.new(1, 0, 0, 40)
+        title.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+        title.Text = "🔥 WORL PREMIUM 🔥"
+        title.TextColor3 = Color3.fromRGB(255, 255, 200)
+        title.Font = Enum.Font.GothamBlack
+        title.TextSize = 20
+        title.Parent = frame
+        
+        local closeBtn = Instance.new("TextButton")
+        closeBtn.Size = UDim2.new(0, 30, 0, 30)
+        closeBtn.Position = UDim2.new(1, -35, 0, 5)
+        closeBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
+        closeBtn.Text = "X"
+        closeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+        closeBtn.Font = Enum.Font.GothamBold
+        closeBtn.TextSize = 18
+        closeBtn.Parent = frame
+        
+        closeBtn.MouseButton1Click:Connect(function()
+            menuOpen = false
+            mainMenu:Destroy()
+            mainMenu = nil
+        end)
+        
+        -- BUTON LİSTESİ (TELEPORT EKLENDİ)
+        local buttonList = {
+            {name = "✈️ FLY", key = "Fly", func = toggleFly},
+            {name = "🚫 NO CLIP", key = "Noclip", func = toggleNoclip},
+            {name = "🛡️ GOD MODE", key = "God", func = toggleGod},
+            {name = "🔺 INF JUMP", key = "InfJump", func = toggleInfJump},
+            {name = "⚡ SPEED (50)", key = "Speed", func = toggleSpeed},
+            {name = "🤖 RAGDOLL (34)", key = "Ragdoll", func = toggleRagdoll},
+            {name = "📍 TELEPORT PART", key = "TeleportPart", func = setTeleportPosition, special = true},
+            {name = "🚀 TELEPORT", key = "Teleport", func = teleportToSaved, special = true}
+        }
+        
+        local scroll = Instance.new("ScrollingFrame")
+        scroll.Size = UDim2.new(1, -20, 1, -80)
+        scroll.Position = UDim2.new(0, 10, 0, 50)
+        scroll.BackgroundTransparency = 1
+        scroll.ScrollBarThickness = 5
+        scroll.CanvasSize = UDim2.new(0, 0, 0, #buttonList * 55)
+        scroll.Parent = frame
+        
+        for i, btn in ipairs(buttonList) do
+            local btnFrame = Instance.new("Frame")
+            btnFrame.Size = UDim2.new(1, 0, 0, 50)
+            btnFrame.Position = UDim2.new(0, 0, 0, (i-1)*55)
+            
+            -- TELEPORT BUTONLARI FARKLI RENK
+            if btn.special then
+                btnFrame.BackgroundColor3 = Color3.fromRGB(50, 40, 60)
+            else
+                btnFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+            end
+            
+            btnFrame.BorderSizePixel = 0
+            btnFrame.Parent = scroll
+            
+            local btnText = Instance.new("TextLabel")
+            btnText.Size = UDim2.new(0.7, 0, 1, 0)
+            btnText.Position = UDim2.new(0, 10, 0, 0)
+            btnText.BackgroundTransparency = 1
+            btnText.Text = btn.name
+            btnText.TextColor3 = btn.special and Color3.fromRGB(100, 255, 255) or Color3.fromRGB(220, 220, 220)
+            btnText.Font = Enum.Font.Gotham
+            btnText.TextSize = 16
+            btnText.TextXAlignment = Enum.TextXAlignment.Left
+            btnText.Parent = btnFrame
+            
+            -- TELEPORT BUTONLARINDA DURUM GÖSTERME
+            local status = Instance.new("TextLabel")
+            status.Size = UDim2.new(0.3, 0, 1, 0)
+            status.Position = UDim2.new(0.7, 0, 0, 0)
+            status.BackgroundTransparency = 1
+            
+            if btn.special then
+                if btn.key == "TeleportPart" then
+                    status.Text = savedPosition and "✅ SET" or "❌ NOT SET"
+                else
+                    status.Text = "🚀 TP"
+                end
+            else
+                status.Text = settings[btn.key] and "✅ ON" or "❌ OFF"
+            end
+            
+            status.TextColor3 = btn.special and Color3.fromRGB(0, 255, 255) or 
+                               (settings[btn.key] and Color3.fromRGB(50, 255, 50) or Color3.fromRGB(255, 50, 50))
+            status.Font = Enum.Font.GothamBold
+            status.TextSize = 14
+            status.Parent = btnFrame
+            
+            local button = Instance.new("TextButton")
+            button.Size = UDim2.new(1, 0, 1, 0)
+            button.BackgroundTransparency = 1
+            button.Text = ""
+            button.Parent = btnFrame
+            
+            button.MouseButton1Click:Connect(function()
+                if btn.special then
+                    -- TELEPORT BUTONLARI
+                    btn.func()
+                    
+                    if btn.key == "TeleportPart" then
+                        status.Text = savedPosition and "✅ SET" or "❌ NOT SET"
+                    end
+                else
+                    -- NORMAL BUTONLAR
+                    settings[btn.key] = not settings[btn.key]
+                    status.Text = settings[btn.key] and "✅ ON" or "❌ OFF"
+                    status.TextColor3 = settings[btn.key] and Color3.fromRGB(50, 255, 50) or Color3.fromRGB(255, 50, 50)
+                    
+                    if btn.func then
+                        btn.func(settings[btn.key])
+                    end
+                end
+            end)
+        end
+        
+        -- TELEPORT BİLGİSİ
+        local teleportInfo = Instance.new("TextLabel")
+        teleportInfo.Size = UDim2.new(1, -20, 0, 40)
+        teleportInfo.Position = UDim2.new(0, 10, 1, -80)
+        teleportInfo.BackgroundTransparency = 1
+        teleportInfo.Text = savedPosition and "📍 Teleport Noktası: AYARLI" or "📍 Teleport Noktası: YOK"
+        teleportInfo.TextColor3 = savedPosition and Color3.fromRGB(100, 255, 100) or Color3.fromRGB(255, 100, 100)
+        teleportInfo.Font = Enum.Font.Gotham
+        teleportInfo.TextSize = 12
+        teleportInfo.TextWrapped = true
+        teleportInfo.Parent = frame
+        
+        -- TUŞ BİLGİSİ
+        local info = Instance.new("TextLabel")
+        info.Size = UDim2.new(1, -20, 0, 30)
+        info.Position = UDim2.new(0, 10, 1, -40)
+        info.BackgroundTransparency = 1
+        info.Text = "📌 F=Fly, N=NoClip, G=God, T=Teleport"
+        info.TextColor3 = Color3.fromRGB(200, 200, 100)
+        info.Font = Enum.Font.Gotham
+        info.TextSize = 12
+        info.TextWrapped = true
+        info.Parent = frame
+    end
+    
+    -- AÇMA BUTONU TIKLAMA
+    mainBtn.MouseButton1Click:Connect(function()
+        menuOpen = not menuOpen
+        
+        if menuOpen then
+            createMenu()
+            mainBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+        else
+            if mainMenu then
+                mainMenu:Destroy()
+                mainMenu = nil
+            end
+            mainBtn.BackgroundColor3 = Color3.fromRGB(255, 50, 50)
+        end
+    end)
+    
+    -- HİLE FONKSİYONLARI
+    local flyGyro, flyVelocity
+    
+    function toggleFly(state)
+        if state then
+            flyGyro = Instance.new("BodyGyro")
+            flyGyro.P = 10000
+            flyGyro.MaxTorque = Vector3.new(10000, 10000, 10000)
+            flyGyro.CFrame = hrp.CFrame
+            flyGyro.Parent = hrp
+            
+            flyVelocity = Instance.new("BodyVelocity")
+            flyVelocity.Velocity = Vector3.new(0, 0, 0)
+            flyVelocity.MaxForce = Vector3.new(10000, 10000, 10000)
+            flyVelocity.Parent = hrp
+            
+            humanoid.PlatformStand = true
+            
+            RS.Heartbeat:Connect(function()
+                if not settings.Fly then return end
+                
+                local cam = WS.CurrentCamera
+                local vel = Vector3.new(0, 0, 0)
+                
+                if UIS:IsKeyDown(Enum.KeyCode.W) then vel = vel + (cam.CFrame.LookVector * 50) end
+                if UIS:IsKeyDown(Enum.KeyCode.S) then vel = vel - (cam.CFrame.LookVector * 50) end
+                if UIS:IsKeyDown(Enum.KeyCode.D) then vel = vel + (cam.CFrame.RightVector * 50) end
+                if UIS:IsKeyDown(Enum.KeyCode.A) then vel = vel - (cam.CFrame.RightVector * 50) end
+                if UIS:IsKeyDown(Enum.KeyCode.Space) then vel = vel + Vector3.new(0, 50, 0) end
+                if UIS:IsKeyDown(Enum.KeyCode.LeftShift) then vel = vel - Vector3.new(0, 50, 0) end
+                
+                flyVelocity.Velocity = vel
+                flyGyro.CFrame = cam.CFrame
+            end)
+        else
+            if flyGyro then flyGyro:Destroy() end
+            if flyVelocity then flyVelocity:Destroy() end
+            humanoid.PlatformStand = false
+        end
+    end
+    
+    function toggleNoclip(state)
+        settings.Noclip = state
+    end
+    
+    function toggleGod(state)
+        if state then
+            humanoid.MaxHealth = math.huge
+            humanoid.Health = math.huge
+        else
+            humanoid.MaxHealth = 100
+            humanoid.Health = 100
+        end
+    end
+    
+    function toggleInfJump(state)
+        settings.InfJump = state
+    end
+    
+    function toggleSpeed(state)
+        humanoid.WalkSpeed = state and 50 or 16
+    end
+    
+    function toggleRagdoll(state)
+        settings.Ragdoll = state
+    end
+    
+    -- NO CLIP LOOP
+    spawn(function()
+        while true do
+            if settings.Noclip and character then
+                for _, v in ipairs(character:GetDescendants()) do
+                    if v:IsA("BasePart") then
+                        v.CanCollide = false
+                    end
+                end
+            end
+            task.wait(0.2)
+        end
+    end)
+    
+    -- OTO RAGDOLL (34 STUD)
+    spawn(function()
+        while true do
+            if settings.Ragdoll then
+                for _, otherPlayer in ipairs(Players:GetPlayers()) do
+                    if otherPlayer ~= player then
+                        local char = otherPlayer.Character
+                        if char then
+                            local otherHRP = char:FindFirstChild("HumanoidRootPart")
+                            if otherHRP then
+                                local distance = (otherHRP.Position - hrp.Position).Magnitude
+                                
+                                if distance <= 34 then
+                                    local otherHumanoid = char:FindFirstChild("Humanoid")
+                                    if otherHumanoid and not otherHumanoid.PlatformStand then
+                                        otherHumanoid.PlatformStand = true
+                                        
+                                        spawn(function()
+                                            task.wait(3)
+                                            if char and char.Parent then
+                                                otherHumanoid.PlatformStand = false
+                                            end
+                                        end)
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+            task.wait(0.5)
+        end
+    end)
+    
+    -- TUŞ KONTROLLERİ
+    UIS.InputBegan:Connect(function(input)
+        -- INF JUMP
+        if input.KeyCode == Enum.KeyCode.Space and settings.InfJump then
+            hrp.Velocity = Vector3.new(hrp.Velocity.X, 100, hrp.Velocity.Z)
+        end
+        
+        -- KISA YOL TUŞLARI
+        if input.KeyCode == Enum.KeyCode.F then
+            settings.Fly = not settings.Fly
+            toggleFly(settings.Fly)
+        elseif input.KeyCode == Enum.KeyCode.N then
+            settings.Noclip = not settings.Noclip
+        elseif input.KeyCode == Enum.KeyCode.G then
+            settings.God = not settings.God
+            toggleGod(settings.God)
+        elseif input.KeyCode == Enum.KeyCode.T then
+            teleportToSaved()
+        elseif input.KeyCode == Enum.KeyCode.Y then
+            setTeleportPosition()
+        elseif input.KeyCode == Enum.KeyCode.V then
+            settings.Ragdoll = not settings.Ragdoll
+        end
+    end)
+    
+    -- SÜRESİZ ZIPLAMA LOOP
+    spawn(function()
+        while true do
+            if settings.InfJump and UIS:IsKeyDown(Enum.KeyCode.Space) then
+                hrp.Velocity = Vector3.new(hrp.Velocity.X, 100, hrp.Velocity.Z)
+            end
+            task.wait(0.1)
+        end
+    end)
+    
+    -- BAŞLANGIÇ MESAJI
+    local loadTime = tick() - startTime
+    print("======================================")
+    print("🔥 WORL PREMIUM HİLE PAKETİ v2.1 🔥")
+    print("⏱️ Yüklenme süresi: " .. string.format("%.3f", loadTime) .. "s")
+    print("📍 Teleport sistemi aktif!")
+    print("📌 Tuşlar: F=Fly, N=NoClip, G=God")
+    print("📌 T=Teleport, Y=TeleportPart Kaydet")
+    print("======================================")
+    
+    -- KARAKTER DEĞİŞİKLİĞİ
+    player.CharacterAdded:Connect(function(newChar)
+        character = newChar
+        humanoid = newChar:WaitForChild("Humanoid")
+        hrp = newChar:WaitForChild("HumanoidRootPart")
+        
+        task.wait(1)
+        
+        -- AYARLARI YENİDEN UYGULA
+        if settings.God then toggleGod(true) end
+        if settings.Speed then toggleSpeed(true) end
+        if settings.Fly then toggleFly(true) end
+    end)
+    
+end)()
